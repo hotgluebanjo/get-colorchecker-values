@@ -1,6 +1,6 @@
 [package]
 name = "colorchecker_values"
-version = "0.1.0"
+version = "0.1.2"
 authors = ["hotgluebanjo <66244111+hotgluebanjo@users.noreply.github.com>"]
 edition = "2018"
 
