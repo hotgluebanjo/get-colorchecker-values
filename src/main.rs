@@ -2,6 +2,15 @@
 // it's the opposite of Nuke. In Nuke, the bottom of the image
 // is 0 and the top is 1079. Inverse of that here.
 // Took forever to figure out.
+//
+// Usage:
+// - Make sure image is 1920x1080
+// - Scale up until the top and bottom patches hit the top of
+//   the frame
+// - Make sure there is space at the sides and the image isn't
+//   too warped
+// - Blur some to average - Working on proper averaging
+// - Export a JPG or PNG
 use image::{ImageBuffer, Rgb};
 use std::{fmt, fs::OpenOptions, io::Write, process};
 use structopt::StructOpt;
@@ -88,7 +97,6 @@ impl fmt::Display for Dataset {
 #[structopt(
     name = "Get ColorChecker",
     about = "Extract datasets from a colorchecker.",
-    version = "0.1.0"
 )]
 struct Cli {
     /// Image of color checker
