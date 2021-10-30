@@ -5,11 +5,8 @@
 //
 // Usage:
 // - Make sure image is 1920x1080
-// - Scale up until the top and bottom patches hit the top of
-//   the frame
-// - Make sure there is space at the sides and the image isn't
-//   too warped
-// - Blur some to average - Working on proper averaging
+// - Scale up and stretch until the patches hit the frame edges
+// - Blur a ton to average - Working on proper averaging
 // - Export a JPG or PNG
 use image::{ImageBuffer, Rgb};
 use std::{fmt, fs::OpenOptions, io::Write, process};
@@ -17,30 +14,30 @@ use structopt::StructOpt;
 
 // Totally unscientific
 const COLORCHECKER_CLASSIC_COORDS: [Pixel; 24] = [
-    Pixel { x: 169, y: 122 },
-    Pixel { x: 547, y: 122 },
-    Pixel { x: 823, y: 122 },
-    Pixel { x: 1100, y: 122 },
-    Pixel { x: 1377, y: 122 },
-    Pixel { x: 1654, y: 122 },
-    Pixel { x: 169, y: 399 },
-    Pixel { x: 547, y: 399 },
-    Pixel { x: 823, y: 399 },
-    Pixel { x: 1100, y: 399 },
-    Pixel { x: 1377, y: 399 },
-    Pixel { x: 1654, y: 399 },
-    Pixel { x: 169, y: 677 },
-    Pixel { x: 547, y: 677 },
-    Pixel { x: 823, y: 677 },
-    Pixel { x: 1100, y: 677 },
-    Pixel { x: 1377, y: 677 },
-    Pixel { x: 1654, y: 677 },
-    Pixel { x: 169, y: 957 },
-    Pixel { x: 547, y: 957 },
-    Pixel { x: 823, y: 957 },
-    Pixel { x: 1100, y: 957 },
-    Pixel { x: 1377, y: 957 },
-    Pixel { x: 1654, y: 957 },
+    Pixel { x: 145, y: 129 },
+    Pixel { x: 480, y: 129 },
+    Pixel { x: 810, y: 129 },
+    Pixel { x: 1135, y: 129 },
+    Pixel { x: 1460, y: 129 },
+    Pixel { x: 1790, y: 129 },
+    Pixel { x: 145, y: 405 },
+    Pixel { x: 480, y: 405 },
+    Pixel { x: 810, y: 405 },
+    Pixel { x: 1135, y: 405 },
+    Pixel { x: 1460, y: 405 },
+    Pixel { x: 1790, y: 405 },
+    Pixel { x: 145, y: 679 },
+    Pixel { x: 480, y: 679 },
+    Pixel { x: 810, y: 679 },
+    Pixel { x: 1135, y: 679 },
+    Pixel { x: 1460, y: 679 },
+    Pixel { x: 1790, y: 679 },
+    Pixel { x: 145, y: 959 },
+    Pixel { x: 480, y: 959 },
+    Pixel { x: 810, y: 959 },
+    Pixel { x: 1135, y: 959 },
+    Pixel { x: 1460, y: 959 },
+    Pixel { x: 1790, y: 959 },
 ];
 
 macro_rules! attempt {
