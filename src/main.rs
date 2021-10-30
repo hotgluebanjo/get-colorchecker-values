@@ -1,33 +1,37 @@
+// NOTE: The Y axis is inverted in the image crate. At least
+// it's the opposite of Nuke. In Nuke, the bottom of the image
+// is 0 and the top is 1079. Inverse of that here.
+// Took forever to figure out.
 use image::{ImageBuffer, Rgb};
 use std::{fmt, fs::OpenOptions, io::Write, process};
 use structopt::StructOpt;
 
 // Totally unscientific
-const COLORCHECKER_COORDS: [Pixel; 24] = [
-    Pixel { x: 150, y: 950 },
-    Pixel { x: 475, y: 950 },
-    Pixel { x: 800, y: 950 },
-    Pixel { x: 1125, y: 950 },
-    Pixel { x: 1450, y: 950 },
-    Pixel { x: 1784, y: 950 },
-    Pixel { x: 150, y: 650 },
-    Pixel { x: 475, y: 650 },
-    Pixel { x: 800, y: 650 },
-    Pixel { x: 1125, y: 650 },
-    Pixel { x: 1450, y: 650 },
-    Pixel { x: 1784, y: 650 },
-    Pixel { x: 150, y: 390 },
-    Pixel { x: 475, y: 390 },
-    Pixel { x: 800, y: 390 },
-    Pixel { x: 1125, y: 390 },
-    Pixel { x: 1450, y: 390 },
-    Pixel { x: 1784, y: 390 },
-    Pixel { x: 150, y: 120 },
-    Pixel { x: 475, y: 120 },
-    Pixel { x: 800, y: 120 },
-    Pixel { x: 1125, y: 120 },
-    Pixel { x: 1450, y: 120 },
-    Pixel { x: 1784, y: 120 },
+const COLORCHECKER_CLASSIC_COORDS: [Pixel; 24] = [
+    Pixel { x: 169, y: 122 },
+    Pixel { x: 547, y: 122 },
+    Pixel { x: 823, y: 122 },
+    Pixel { x: 1100, y: 122 },
+    Pixel { x: 1377, y: 122 },
+    Pixel { x: 1654, y: 122 },
+    Pixel { x: 169, y: 399 },
+    Pixel { x: 547, y: 399 },
+    Pixel { x: 823, y: 399 },
+    Pixel { x: 1100, y: 399 },
+    Pixel { x: 1377, y: 399 },
+    Pixel { x: 1654, y: 399 },
+    Pixel { x: 169, y: 677 },
+    Pixel { x: 547, y: 677 },
+    Pixel { x: 823, y: 677 },
+    Pixel { x: 1100, y: 677 },
+    Pixel { x: 1377, y: 677 },
+    Pixel { x: 1654, y: 677 },
+    Pixel { x: 169, y: 957 },
+    Pixel { x: 547, y: 957 },
+    Pixel { x: 823, y: 957 },
+    Pixel { x: 1100, y: 957 },
+    Pixel { x: 1377, y: 957 },
+    Pixel { x: 1654, y: 957 },
 ];
 
 macro_rules! attempt {
@@ -100,7 +104,7 @@ fn main() {
 
     println!("Reading image..."); // Takes long enough
     let image = attempt!(image::open(args.filename), "Can't open image").to_rgb32f();
-    let dataset = Dataset::from_colorchecker(image, COLORCHECKER_COORDS);
+    let dataset = Dataset::from_colorchecker(image, COLORCHECKER_CLASSIC_COORDS);
 
     if let Some(name) = args.output_name {
         let mut file = OpenOptions::new()
