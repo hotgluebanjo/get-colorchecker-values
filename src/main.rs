@@ -6,38 +6,37 @@
 // Usage:
 // - Make sure image is 1920x1080
 // - Scale up and stretch until the patches hit the frame edges
-// - Blur a ton to average - Working on proper averaging
 // - Export a JPG or PNG
 use image::{ImageBuffer, Rgb};
 use std::{fmt, fs::OpenOptions, io::Write, process};
 use structopt::StructOpt;
 
 // Totally unscientific
-const COLORCHECKER_CLASSIC_COORDS: [Pixel; 24] = [
-    Pixel { x: 145, y: 129 },
-    Pixel { x: 480, y: 129 },
-    Pixel { x: 810, y: 129 },
-    Pixel { x: 1135, y: 129 },
-    Pixel { x: 1460, y: 129 },
-    Pixel { x: 1790, y: 129 },
-    Pixel { x: 145, y: 405 },
-    Pixel { x: 480, y: 405 },
-    Pixel { x: 810, y: 405 },
-    Pixel { x: 1135, y: 405 },
-    Pixel { x: 1460, y: 405 },
-    Pixel { x: 1790, y: 405 },
-    Pixel { x: 145, y: 679 },
-    Pixel { x: 480, y: 679 },
-    Pixel { x: 810, y: 679 },
-    Pixel { x: 1135, y: 679 },
-    Pixel { x: 1460, y: 679 },
-    Pixel { x: 1790, y: 679 },
-    Pixel { x: 145, y: 959 },
-    Pixel { x: 480, y: 959 },
-    Pixel { x: 810, y: 959 },
-    Pixel { x: 1135, y: 959 },
-    Pixel { x: 1460, y: 959 },
-    Pixel { x: 1790, y: 959 },
+const COLORCHECKER_CLASSIC_COORDS: [Point2d; 24] = [
+    Point2d { x: 145, y: 129 },
+    Point2d { x: 480, y: 129 },
+    Point2d { x: 810, y: 129 },
+    Point2d { x: 1135, y: 129 },
+    Point2d { x: 1460, y: 129 },
+    Point2d { x: 1790, y: 129 },
+    Point2d { x: 145, y: 405 },
+    Point2d { x: 480, y: 405 },
+    Point2d { x: 810, y: 405 },
+    Point2d { x: 1135, y: 405 },
+    Point2d { x: 1460, y: 405 },
+    Point2d { x: 1790, y: 405 },
+    Point2d { x: 145, y: 679 },
+    Point2d { x: 480, y: 679 },
+    Point2d { x: 810, y: 679 },
+    Point2d { x: 1135, y: 679 },
+    Point2d { x: 1460, y: 679 },
+    Point2d { x: 1790, y: 679 },
+    Point2d { x: 145, y: 959 },
+    Point2d { x: 480, y: 959 },
+    Point2d { x: 810, y: 959 },
+    Point2d { x: 1135, y: 959 },
+    Point2d { x: 1460, y: 959 },
+    Point2d { x: 1790, y: 959 },
 ];
 
 macro_rules! attempt {
@@ -56,7 +55,7 @@ macro_rules! attempt {
 }
 
 #[derive(Debug)]
-struct Pixel {
+struct Point2d {
     x: u32,
     y: u32,
 }
@@ -71,12 +70,40 @@ impl Dataset {
         Self { x }
     }
 
-    fn from_colorchecker(image: ImageBuffer<Rgb<f32>, Vec<f32>>, coords: [Pixel; 24]) -> Self {
+    fn from_colorchecker(image: ImageBuffer<Rgb<f32>, Vec<f32>>, coords: [Point2d; 24]) -> Self {
         let mut values = Vec::new();
         for i in coords.iter() {
-            values.push(image.get_pixel(i.x, i.y).0);
+            // values.push(image.get_pixel(i.x, i.y).0);
+            values.push(Self::average_patch(image.clone(), i.x, i.y, 85));
         }
         Self::new(values)
+    }
+
+    // Very bad style
+    fn average_patch(
+        image: ImageBuffer<Rgb<f32>, Vec<f32>>,
+        x: u32,
+        y: u32,
+        radius: u32,
+    ) -> [f32; 3] {
+        let (mut red, mut green, mut blue, mut num) = (0.0, 0.0, 0.0, 0.0);
+        let (width, height) = image.dimensions();
+
+        for i in (x - radius)..(x + radius) {
+            for j in (y - radius)..(y + radius) {
+                if i >= width || j >= height {
+                    continue;
+                }
+
+                let c = image.get_pixel(i, j).0;
+                red += c[0];
+                green += c[1];
+                blue += c[2];
+                num += 1.0;
+            }
+        }
+
+        [red / num, green / num, blue / num]
     }
 }
 
