@@ -1,0 +1,11 @@
+[package]
+name = "colorchecker_values"
+version = "0.1.0"
+authors = ["hotgluebanjo <66244111+hotgluebanjo@users.noreply.github.com>"]
+edition = "2018"
+
+[dependencies]
+# Need dev since they added support for f32 today. Perfect timing.
+# https://github.com/image-rs/image/commit/8d2f5ea60964114b42b4efad24d97f6748724eef
+image = { git = "https://github.com/image-rs/image" }
+structopt = "0.3.25"
