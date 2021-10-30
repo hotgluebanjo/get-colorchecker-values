@@ -11,6 +11,13 @@ use image::{ImageBuffer, Rgb};
 use std::{fmt, fs::OpenOptions, io::Write, process};
 use structopt::StructOpt;
 
+const USAGE_INSTRUCTIONS: &str = "Extract datasets from a ColorChecker.
+Notes:
+This is a very simple app, so it's a little finicky. Here's how to prep images for it:
+- Make sure the image provided is 1920x1080
+- Scale up and stretch until the patches hit the frame edges
+- Export a JPG or PNG";
+
 // Totally unscientific
 const COLORCHECKER_CLASSIC_COORDS: [Point2d; 24] = [
     Point2d { x: 145, y: 129 },
@@ -119,8 +126,9 @@ impl fmt::Display for Dataset {
 // Totally overboard
 #[derive(StructOpt)]
 #[structopt(
-    name = "Get ColorChecker",
-    about = "Extract datasets from a colorchecker."
+    name = "Get ColorChecker Values",
+    about = USAGE_INSTRUCTIONS
+
 )]
 struct Cli {
     /// Image of color checker

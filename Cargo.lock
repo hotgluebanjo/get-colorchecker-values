@@ -96,14 +96,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3d7b894f5411737b7867f4827955924d7c254fc9f4d91a6aad6b097804b1018b"
 
 [[package]]
-name = "colorchecker_values"
-version = "0.1.2"
-dependencies = [
- "image",
- "structopt",
-]
-
-[[package]]
 name = "crc32fast"
 version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -287,6 +279,14 @@ name = "futures-sink"
 version = "0.3.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "36ea153c13024fe480590b3e3d4cad89a0cfacecc24577b68f86c6ced9c2bc11"
+
+[[package]]
+name = "get_colorchecker_values"
+version = "0.2.0"
+dependencies = [
+ "image",
+ "structopt",
+]
 
 [[package]]
 name = "getrandom"
