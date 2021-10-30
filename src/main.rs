@@ -93,7 +93,7 @@ impl fmt::Display for Dataset {
 #[derive(StructOpt)]
 #[structopt(
     name = "Get ColorChecker",
-    about = "Extract datasets from a colorchecker.",
+    about = "Extract datasets from a colorchecker."
 )]
 struct Cli {
     /// Image of color checker
