@@ -211,7 +211,7 @@ impl fmt::Display for Dataset {
 struct Cli {
     /// Path to the image(s) of the ColorChecker
     #[structopt(parse(from_os_str))]
-    path: Option<PathBuf>,
+    path: PathBuf,
 
     /// Name of file to write dataset to if desired
     #[structopt(short, long)]
@@ -248,18 +248,16 @@ fn get_values(path: PathBuf, output_name: &Option<String>) -> ImageResult<()> {
 fn main() {
     let args = Cli::from_args();
 
-    if let Some(path) = args.path {
-        if args.recursive {
-            let dir = attempt!(fs::read_dir(path), "Invalid directory");
+    if args.recursive {
+        let dir = attempt!(fs::read_dir(args.path), "Invalid directory");
 
-            for i in dir {
-                let file = i.unwrap().path();
+        for i in dir {
+            let file = i.unwrap().path();
 
-                get_values(file, &args.output_name)
-                    .unwrap_or_else(|_| eprintln!("Failed to read file"));
-            }
-        } else {
-            attempt!(get_values(path, &args.output_name), "Can't open image");
+            get_values(file, &args.output_name)
+                .unwrap_or_else(|_| eprintln!("Failed to read file"));
         }
+    } else {
+        attempt!(get_values(args.path, &args.output_name), "Can't open image");
     }
 }
