@@ -282,7 +282,7 @@ checksum = "36ea153c13024fe480590b3e3d4cad89a0cfacecc24577b68f86c6ced9c2bc11"
 
 [[package]]
 name = "get_colorchecker_values"
-version = "0.2.2"
+version = "0.2.4"
 dependencies = [
  "image",
  "structopt",
