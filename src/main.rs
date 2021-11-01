@@ -2,13 +2,8 @@
 // it's the opposite of Nuke. In Nuke, the bottom of the image
 // is 0 and the top is 1079. Inverse of that here.
 // Took forever to figure out.
-//
-// Usage:
-// - Scale up and stretch the image until edges of the color patches
-//   hit the edges of the frame
-// - Export a JPG or PNG
-use image::{ImageBuffer, Rgb};
-use std::{fmt, fs::OpenOptions, io::Write, process};
+use image::{ImageBuffer, ImageResult, Rgb};
+use std::{fmt, fs, io::Write, path::PathBuf, process};
 use structopt::StructOpt;
 
 type Image = ImageBuffer<Rgb<f32>, Vec<f32>>;
@@ -16,10 +11,10 @@ type Triplet = [f32; 3];
 type CheckerPoints<'a> = &'a [Point2d<f32>];
 
 const USAGE_INSTRUCTIONS: &str = "Extract datasets from a ColorChecker.
-Notes:
+
 This is a very simple app, so it's a little finicky. Here's how to prep images for it:
 - Scale up and stretch the image until edges of the color patches hit the edges of the frame
-- Export a JPG or PNG";
+- Export a JPG or PNG - The image must be log encoded or display-linear-like";
 
 macro_rules! attempt {
     ($x:expr, $message:expr) => {
@@ -36,7 +31,7 @@ macro_rules! attempt {
     };
 }
 
-// Relative to 1.0 instead of 1080 or whatever specific resolution.
+// Relative to 1.0 instead of 1080 or a specific resolution.
 const COLORCHECKER_CLASSIC: CheckerPoints = &[
     Point2d {
         x: 0.0755,
@@ -143,7 +138,6 @@ enum Colorchecker<'a> {
 }
 
 impl Colorchecker<'_> {
-    // Very bad style
     fn average_patch(image: Image, x: u32, y: u32, radius: u32) -> Triplet {
         let (mut red, mut green, mut blue, mut num) = (0.0, 0.0, 0.0, 0.0);
         let (width, height) = image.dimensions();
@@ -155,6 +149,7 @@ impl Colorchecker<'_> {
                 }
 
                 let c = image.get_pixel(i, j).0;
+
                 red += c[0];
                 green += c[1];
                 blue += c[2];
@@ -214,32 +209,57 @@ impl fmt::Display for Dataset {
     about = USAGE_INSTRUCTIONS
 )]
 struct Cli {
-    /// Image of color checker
-    filename: String,
+    /// Path to the image(s) of the ColorChecker
+    #[structopt(parse(from_os_str))]
+    path: Option<PathBuf>,
 
     /// Name of file to write dataset to if desired
-    #[structopt(long, short)]
+    #[structopt(short, long)]
     output_name: Option<String>,
+
+    /// Iterate through each file in the provided directory - Use . for the current one
+    #[structopt(short, long)]
+    recursive: bool,
+}
+
+fn get_values(path: PathBuf, output_name: &Option<String>) -> ImageResult<()> {
+    println!("Reading image..."); // Takes long enough
+    let image = image::open(path)?.to_rgb32f();
+    let colorchecker = Colorchecker::Classic(COLORCHECKER_CLASSIC);
+
+    let dataset = Dataset::from_colorchecker(image, colorchecker);
+
+    match output_name {
+        Some(name) => {
+            let mut file = fs::OpenOptions::new()
+                .create(true)
+                .write(true)
+                .append(true)
+                .open(name)
+                .unwrap();
+            write!(file, "{}", dataset).unwrap();
+        }
+        None => print!("{}", dataset),
+    }
+
+    Ok(())
 }
 
 fn main() {
     let args = Cli::from_args();
 
-    println!("Reading image..."); // Takes long enough
-    let image = attempt!(image::open(args.filename), "Can't open image").to_rgb32f();
-    let colorchecker = Colorchecker::Classic(COLORCHECKER_CLASSIC);
+    if let Some(path) = args.path {
+        if args.recursive {
+            let dir = attempt!(fs::read_dir(path), "Invalid directory");
 
-    let dataset = Dataset::from_colorchecker(image, colorchecker);
+            for i in dir {
+                let file = i.unwrap().path();
 
-    if let Some(name) = args.output_name {
-        let mut file = OpenOptions::new()
-            .create(true)
-            .write(true)
-            .append(true)
-            .open(name)
-            .unwrap();
-        attempt!(write!(file, "{}", dataset));
-    } else {
-        print!("{}", dataset);
+                get_values(file, &args.output_name)
+                    .unwrap_or_else(|_| eprintln!("Failed to read file"));
+            }
+        } else {
+            attempt!(get_values(path, &args.output_name), "Can't open image");
+        }
     }
 }
