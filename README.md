@@ -2,4 +2,16 @@
 
 Extract datasets from ColorChecker patches.
 
-Check `get_colorchecker_values --help` for help.
+## Usage
+
+```
+get-colorchecker-values chart.tiff
+```
+
+```
+get-colorchecker-values chart.tiff -o chart.txt
+```
+
+```
+get-colorchecker-values --help
+```
