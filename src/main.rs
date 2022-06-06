@@ -12,22 +12,20 @@ type CheckerPoints<'a> = &'a [Point2d<f32>];
 
 const USAGE_INSTRUCTIONS: &str = "Extract datasets from a ColorChecker.
 
-This is a very simple app, so it's a little finicky. Here's how to prep images for it:
-- Scale up and stretch the image until edges of the color patches hit the edges of the frame
-- Export a JPG or PNG - The image must be log encoded or display-linear-like";
+Scale up and stretch the image until edges of the color patches hit the edges of the frame";
 
 macro_rules! attempt {
     ($x:expr, $message:expr) => {
         $x.unwrap_or_else(|_| {
             eprintln!("Error: {}", $message);
             process::exit(1);
-        });
+        })
     };
     ($x:expr) => {
         $x.unwrap_or_else(|e| {
             eprintln!("Error: {:?}", e);
             process::exit(1);
-        });
+        })
     };
 }
 
